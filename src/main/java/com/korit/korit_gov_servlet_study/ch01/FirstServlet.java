@@ -4,20 +4,31 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
 
-public class FirstServlet extends HttpServlet {
-    @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.service(req, resp);
-    }
+/*
+* 서블릿
+* 클라이언트의 요청을 처리하고 그 결과를 반환 하는 Servlet 클래스의 구현 규칙을 지킨 자바 웹 프로그램
+* */
 
-    @Override
-    public void destroy() {
-        super.destroy();
+public class FirstServlet extends HttpServlet {
+    /*
+    * init ->  서블릿 초기화 메서드, 컨테이너(톰캣서버) 딱 한 번 호출
+    * 생성자 -> init()(1회) -> (요청마다)service() -> (요청 메소드에 따라)doGet, doPost 등 호출 -> 서버 종료시 destroy()
+    * */
+
+    public FirstServlet() {
+        System.out.println("FirstServlet 생성자 호출");
     }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+        System.out.println("init 메서드 호출 초기화");
+        config.getServletContext().setAttribute("age", 27);
+    }
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        super.service(req, resp);
+        System.out.println("service 메소드 호출 요청 들어옴");
     }
 
     @Override
@@ -28,5 +39,10 @@ public class FirstServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("destroy 메소드 호출 소멸");
     }
 }
