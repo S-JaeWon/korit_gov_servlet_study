@@ -31,7 +31,25 @@ public class UserServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         }
+        /*req.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        List<User> foundUsers = users.stream()
+                .filter(user -> user.getUsername().equals(req.getParameter("username")))
+                .toList();
+
+        User foundUser = foundUsers.isEmpty() ? null : foundUsers.get(0);
+
+        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        resp.setContentType("text/html");
+        if (foundUser == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().println("해당 username은 존재하지 않습니다.");
+            return;
+        }
+        resp.getWriter().println(foundUser);*/
     }
+
+
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,7 +66,7 @@ public class UserServlet extends HttpServlet {
                 .email(email)
                 .build();
 
-        Map<String ,String> error = validUser(user);
+        Map<String, String> error = validUser(user);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         if (!error.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -73,7 +91,7 @@ public class UserServlet extends HttpServlet {
 
             try {
                 //리플렉션으로 필드값 꺼내기
-                Object fieldValue = f.get(user);
+                Object fieldValue = f.get(user); // 꺼내오는 값이 어떤 타입인지 모르므로 Object
                 System.out.println(fieldValue);
                 if (fieldValue == null) { //null 값 체크
                     throw new RuntimeException();
