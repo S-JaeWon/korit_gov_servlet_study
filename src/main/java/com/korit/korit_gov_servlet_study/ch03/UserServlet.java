@@ -31,7 +31,7 @@ public class UserServlet extends HttpServlet {
 
         List<User> userlist = userRepository.userList();
 
-        SuccessResponse<List> successResponse = SuccessResponse.<List>builder()
+        SuccessResponse<List<User>> successResponse = SuccessResponse.<List<User>>builder()
                 .status(200)
                 .message("조회 완료")
                 .body(userlist)
