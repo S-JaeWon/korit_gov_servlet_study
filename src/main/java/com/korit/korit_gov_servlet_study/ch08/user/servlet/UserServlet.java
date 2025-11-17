@@ -1,7 +1,10 @@
 package com.korit.korit_gov_servlet_study.ch08.user.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.google.protobuf.Api;
 import com.korit.korit_gov_servlet_study.ch08.user.dto.ApiRespDto;
 import com.korit.korit_gov_servlet_study.ch08.user.dto.SignupReqDto;
@@ -12,28 +15,49 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @WebServlet("/ch08/user")
 public class UserServlet extends HttpServlet {
     private UserService userService;
-    private Gson gson;
+    private ObjectMapper objectMapper;
 
     @Override
     public void init() throws ServletException {
         userService = UserService.getInstance();
-        gson = new GsonBuilder().create();
+        objectMapper = new ObjectMapper();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String username = req.getParameter("username");
+        String keyword = req.getParameter("keyword");
+        ApiRespDto<?> apiRespDto = null;
+
+        if (username != null) {
+            Optional<User> searchUser= userService.searchByUsername(username);
+            if (searchUser.isPresent()) {
+                apiRespDto = ApiRespDto.<User>builder()
+                        .status("success")
+                        .message(username + " 회원 조회")
+                        .body(searchUser.get())
+                        .build();
+            }
+        } else if (keyword != null) {
+
+        } else {
+
+        }
+
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        SignupReqDto signupReqDto = gson.fromJson(req.getReader(), SignupReqDto.class); // json -> dto
+        SignupReqDto signupReqDto = objectMapper.readValue(req.getReader(), SignupReqDto.class);
 
         ApiRespDto<?> apiRespDto;
-        String json;
 
         if (userService.checkUsername(signupReqDto.getUsername())) {
             apiRespDto = ApiRespDto.<String>builder()
@@ -49,7 +73,6 @@ public class UserServlet extends HttpServlet {
                     .body(user)
                     .build();
         }
-        json = gson.toJson(apiRespDto);
-        resp.getWriter().write(json);
+        objectMapper.writeValue(resp.getWriter(), apiRespDto);
     }
 }

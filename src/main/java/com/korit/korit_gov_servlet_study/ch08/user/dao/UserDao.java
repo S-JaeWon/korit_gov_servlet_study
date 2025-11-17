@@ -4,6 +4,8 @@ import com.korit.korit_gov_servlet_study.ch08.user.entity.User;
 import com.korit.korit_gov_servlet_study.ch08.user.util.ConnectionFactory;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserDao {
@@ -29,19 +31,37 @@ public class UserDao {
             ps.setString(2, user.getPassword());
             ps.setInt(3, user.getAge());
 
-            if (ps.execute()) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        Integer userId = rs.getInt("user_id");
-                        user.setUserId(userId);
-                    }
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    Integer userId = rs.getInt(1);
+                    user.setUserId(userId);
                 }
-                return user;
             }
+            return user;
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<User> userListAll() {
+        String sql = "select * from user_tb";
+        List<User> userAll = new ArrayList<>();
+        try (
+                Connection con = ConnectionFactory.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs =  ps.executeQuery();
+        ) {
+            while (rs.next()) {
+                userAll.add(toUser(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userAll;
     }
 
     public Optional<User> searchUsername(String username) {
@@ -54,7 +74,7 @@ public class UserDao {
            ps.setString(1, username);
 
            try (ResultSet rs = ps.executeQuery()){
-                return rs.next() ? Optional.of(toUser(rs))/*toUser(rs)*/ : null;
+                return rs.next() ? Optional.of(toUser(rs))/*toUser(rs)*/ : Optional.empty();
            }
 
         } catch (SQLException e) {
@@ -72,6 +92,4 @@ public class UserDao {
                 .createDt(resultSet.getTimestamp("create_dt").toLocalDateTime())
                 .build();
     }
-
-
 }
