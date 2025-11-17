@@ -20,12 +20,14 @@ public class UserService {
 
     public boolean isDupleUsername(String username) {
         User searchUsername = userRepository.searchByUsername(username);
-        return searchUsername == null;
+        return searchUsername != null;
     }
 
-    public User addUser(User user) {
+    public User addUser(SignupReqDto signupReqDto) {
+        User user = signupReqDto.toEntity();
         return userRepository.add(user);
     }
+
 
     public List<User> userGetAll() {
         return userRepository.userListAll();
